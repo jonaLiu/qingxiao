@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="header">
+<header role="header">
+    <div class="container">
+
+        <!-- logo -->
+
+        <h1> <a th:href="@{/}" title="qingxiao"><img th:src="@{/site/images/qingxiao.png}" title="qingxiao" alt="qingxiao"/></a> </h1>
+
+        <!-- logo -->
+
+        <!-- nav -->
+
+        <nav role="header-nav" class="navy">
+            <ul>
+                <li th:class="${active == 'we' ? 'nav-active':''}"><a th:href="@{/}" title="We">We</a></li>
+                <li th:class="${active == 'about' ? 'nav-active':''}"><a  th:href="@{/about}" title="About">About</a></li>
+                <li th:class="${active == 'blog' ? 'nav-active':''}"><a th:href="@{/blog/index}" title="Blog">Blog</a></li>
+            </ul>
+        </nav>
+
+        <!-- nav -->
+
+    </div>
+</header>
+</html>
