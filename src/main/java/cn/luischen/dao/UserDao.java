@@ -34,4 +34,10 @@ public interface UserDao {
      */
     UserDomain getUserInfoByCond(@Param("username") String username, @Param("password") String password);
 
+    /**
+     * 添加新用户
+     * @param user
+     * @return
+     */
+    int insertUserInfo(UserDomain user);
 }

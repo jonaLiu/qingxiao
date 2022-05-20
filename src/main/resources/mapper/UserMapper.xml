@@ -50,5 +50,30 @@
         </where>
     </select>
 
+    <insert id="insertUserInfo" parameterType="cn.luischen.model.UserDomain">
+        INSERT INTO t_users
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="username != null">
+                username,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="groupName != null">
+                groupName,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="username != null">
+                #{username, jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password, jdbcType=VARCHAR},
+            </if>
+            <if test="groupName != null">
+                #{groupName, jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
 
 </mapper>

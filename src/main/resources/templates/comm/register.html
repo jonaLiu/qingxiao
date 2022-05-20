@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <link rel="shortcut icon" th:href="@{/admin/images/favicon.png}"/>
-    <title>My Blog - 用户登录</title>
+    <title>My Blog - 用户注册</title>
     <link th:href="@{//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css}" rel="stylesheet"/>
     <link th:href="@{//cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css}" rel="stylesheet" type="text/css"/>
     <link th:href="@{/admin/css/style.min.css}" rel="stylesheet" type="text/css"/>
@@ -54,34 +54,31 @@
     <div class="panel panel-color panel-danger panel-pages panel-shadow">
         <div class="panel-heading bg-img">
             <div class="bg-overlay"></div>
-            <h3 class="text-center m-t-10"> Login My Site</h3>
+            <h3 class="text-center m-t-10"> Register my Site</h3>
         </div>
         <div class="panel-body">
-            <form class="form-horizontal m-t-20" method="post" id="loginForm" onsubmit="return checkForm()">
+            <form class="form-horizontal m-t-20" id="loginForm">
                 <div class="form-group">
                     <div class="col-xs-12">
                         <input class=" input-lg input-border" name="username" type="text" required=""
-                               placeholder="账号:"/>
+                               placeholder="账号："/>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-xs-12">
                         <input class=" input-lg input-border" name="password" type="password" required=""
-                               placeholder="密码:"/>
+                               placeholder="密码："/>
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-xs-12">
-                        <div class="checkbox checkbox-danger">
-                            <input id="checkbox-signup" name="remeber_me" type="checkbox"/>
-                            <label for="checkbox-signup">记住我</label>
-                        </div>
+                        <input class=" input-lg input-border" name="password2" type="password" required=""
+                               placeholder="确认密码:"/>
                     </div>
                 </div>
                 <div class="form-group text-center m-t-40">
                     <div class="col-xs-12">
-                        <button class="btn btn-danger btn-lg btn-rounded btn-block w-lg waves-effect waves-light" style="box-shadow: 0px 0px 4px #868282;" type="submit">登&nbsp;录
-                        </button>
+                        <button class="btn btn-danger btn-lg btn-rounded btn-block w-lg waves-effect waves-light" style="box-shadow: 0px 0px 4px #868282;" type="button" onclick="register()">立即注册</button>
                     </div>
                 </div>
             </form>
@@ -96,15 +93,25 @@
 <script type="text/javascript">
     /*<![CDATA[*/
     var tale = new $.tale();
-    function checkForm() {
+    function register() {
+        if (loginForm.password.value != loginForm.password2.value) {
+            tale.alertError('两次密码不一致！');
+            return false;
+        }
         tale.post({
-            url: '/admin/login',
+            url: '/register',
             data: $("#loginForm").serialize(),
             success: function (result) {
                 if (result && result.code == 'success') {
-                    window.location.href = '/admin/index';
+                    var groupName = result.data.groupName;
+                    if (groupName != 'admin') {
+                        window.location.href = '/index';
+                    }
+                    else {
+                        window.location.href = '/admin/index';
+                     }
                 } else {
-                    tale.alertError(result.msg || '登录失败');
+                    tale.alertError(result.msg || '注册失败');
                 }
             }
         });

@@ -1,8 +1,7 @@
-package cn.luischen.controller.admin;
+package cn.luischen.controller;
 
 import cn.luischen.constant.LogActions;
 import cn.luischen.constant.WebConst;
-import cn.luischen.controller.BaseController;
 import cn.luischen.exception.BusinessException;
 import cn.luischen.model.UserDomain;
 import cn.luischen.service.log.LogService;
@@ -19,9 +18,13 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +36,6 @@ import java.io.IOException;
  */
 @Api("登录相关接口")
 @Controller
-@RequestMapping(value = "/admin")
 public class AuthController extends BaseController{
 
     private static final Logger LOGGER = LogManager.getLogger(AuthController.class);
@@ -47,7 +49,7 @@ public class AuthController extends BaseController{
     @ApiOperation("跳转登录页")
     @GetMapping(value = "/login")
     public String login(){
-        return "admin/login";
+        return "comm/login";
     }
 
     @ApiOperation("登录")
@@ -69,8 +71,9 @@ public class AuthController extends BaseController{
 
         String ip= IPKit.getIpAddrByRequest(request); // 获取ip并过滤登录时缓存的bug
         Integer error_count = cache.hget("login_error_count",ip);
+        UserDomain userInfo = null;
         try {
-            UserDomain userInfo = userService.login(username, password);
+            userInfo = userService.login(username, password);
             request.getSession().setAttribute(WebConst.LOGIN_SESSION_KEY, userInfo);
             if (StringUtils.isNotBlank(remeber_me)) {
                 TaleUtils.setCookie(response, userInfo.getUid());
@@ -92,7 +95,7 @@ public class AuthController extends BaseController{
             return APIResponse.fail(msg);
         }
 
-        return APIResponse.success();
+        return APIResponse.success(userInfo);
 
     }
 
@@ -111,7 +114,7 @@ public class AuthController extends BaseController{
         cookie.setPath("/");
         response.addCookie(cookie);
         try {
-            response.sendRedirect("/admin/login");
+            response.sendRedirect("/login");
         } catch (IOException e) {
             e.printStackTrace();
             LOGGER.error("注销失败", e);
@@ -119,4 +122,53 @@ public class AuthController extends BaseController{
     }
 
 
+    /**
+     * 注册表单页
+     *
+     */
+    @GetMapping(value = "/register_form")
+    public String registerForm() {
+        return "comm/register";
+    }
+
+    /**
+     * 注册
+     */
+    @ApiOperation("注册")
+    @PostMapping(value = "/register")
+    @ResponseBody
+    public APIResponse toRegister(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @ApiParam(name = "username", value = "用户名", required = true)
+            @RequestParam(name = "username", required = true)
+                    String username,
+            @ApiParam(name = "password", value = "密码", required = true)
+            @RequestParam(name = "password", required = true)
+                    String password
+    ){
+        UserDomain userInfo = new UserDomain();
+        try {
+            String passwordEncrypted = TaleUtils.MD5encode(username + password);
+            userInfo.setUsername(username);
+            userInfo.setPassword(passwordEncrypted);
+            userInfo.setGroupName("visitor");
+            userService.register(userInfo);
+
+            // 设置cookie直接跳转到主页
+            userInfo = userService.login(username, password);
+            request.getSession().setAttribute(WebConst.LOGIN_SESSION_KEY, userInfo);
+            TaleUtils.setCookie(response, userInfo.getUid());
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            String msg = " 注册失败";
+            if (e instanceof BusinessException) {
+                msg = e.getMessage();
+            } else {
+                LOGGER.error(msg, e);
+            }
+            return APIResponse.fail(msg);
+        }
+        return APIResponse.success(userInfo);
+    }
 }

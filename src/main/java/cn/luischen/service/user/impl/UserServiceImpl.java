@@ -48,5 +48,11 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-
+    @Override
+    public int register(UserDomain userInfo) {
+        if (StringUtils.isBlank(userInfo.getUsername()) || StringUtils.isBlank(userInfo.getPassword())) {
+            throw BusinessException.withErrorCode(ErrorConstant.Auth.USERNAME_PASSWORD_IS_EMPTY);
+        }
+        return userDao.insertUserInfo(userInfo);
+    }
 }

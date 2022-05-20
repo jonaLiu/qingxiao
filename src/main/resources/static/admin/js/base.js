@@ -134,6 +134,26 @@ $.tale.prototype.post = function (options) {
         async: options.async || false,
         dataType: 'json',
         success: function (result) {
+            console.log(result);
+            self.hideLoading();
+            options.success && options.success(result);
+        },
+        error: function () {
+            //
+        }
+    });
+};
+
+$.tale.prototype.get = function (options) {
+    var self = this;
+    $.ajax({
+        type: 'GET',
+        url: options.url,
+        data: options.data || {},
+        async: options.async || false,
+        dataType: 'json',
+        success: function (result) {
+            console.log(result);
             self.hideLoading();
             options.success && options.success(result);
         },

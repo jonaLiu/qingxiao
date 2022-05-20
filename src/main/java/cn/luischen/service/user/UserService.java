@@ -35,4 +35,11 @@ public interface UserService {
      */
     UserDomain login(String username, String password);
 
+    /**
+     * 注册新用户
+     * @param user
+     * @return
+     */
+    int register(UserDomain user);
+
 }
